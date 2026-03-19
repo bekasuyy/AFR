@@ -13,13 +13,14 @@ ffi.cdef([[
 ]])
 
 local POSITION_SHIFT_VALUE = ((350.0 / 180.0) + (215.0 / 140.0)) / 2.0
-local HALF_PI = math.pi / 2
+local HALF_PI  = math.pi / 2
+local ZOOM     = 180.0  -- default 180
 
-local pRadarRange  = cast("float*", base + 0x994DAC)
+local pRadarRange   = cast("float*", base + 0x994DAC)
 local pRadarOriginX = cast("float*", base + 0x994DA4)
 local pRadarOriginY = cast("float*", base + 0x994DA8)
-local pSin         = cast("float*", base + 0x994EEC)
-local pCos         = cast("float*", base + 0x994EE8)
+local pSin          = cast("float*", base + 0x994EEC)
+local pCos          = cast("float*", base + 0x994EE8)
 
 local outVec = ffi.new("vec3")
 
@@ -37,10 +38,11 @@ local radarMapHook
 radarMapHook = hook.new(
     "void(*)(void*)",
     function(self)
+        pRadarRange[0] = ZOOM
+
         gta._Z29FindPlayerCentreOfWorldForMapi(outVec, -1)
 
-        local posShift = pRadarRange[0] / POSITION_SHIFT_VALUE
-
+        local posShift = ZOOM / POSITION_SHIFT_VALUE
         pRadarOriginX[0] = outVec.x - math.cos(-HALF_PI) * posShift
         pRadarOriginY[0] = outVec.y - math.sin(-HALF_PI) * posShift
 
